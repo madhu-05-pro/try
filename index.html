@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Button</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin-top: 50px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        input, button { 
+            margin: 10px; 
+            padding: 10px; 
+            font-size: 18px; 
+        }
+        #emergencyBtn { 
+            display: none; 
+            background-color: red; 
+            color: white; 
+            border: none; 
+            border-radius: 50%; 
+            width: 150px; 
+            height: 150px; 
+            font-size: 24px; 
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emergency Contact System</h1>
+    <p>Enter your phone number to activate the emergency button:</p>
+    
+    <input type="tel" id="phoneNumber" placeholder="Enter your phone number" />
+    <button onclick="checkNumber()">Submit</button>
+    
+    <button id="emergencyBtn" onclick="sendEmergency()">Emergency</button>
+    
+    <script>
+        let latitude = null;
+        let longitude = null;
+
+        function checkNumber() {
+            const phoneNumber = document.getElementById("phoneNumber").value;
+            if (phoneNumber) {
+                document.getElementById("emergencyBtn").style.display = "block";
+                alert("Number saved. Emergency button activated.");
+            } else {
+                alert("Please enter a valid phone number.");
+            }
+        }
+
+        function sendEmergency() {
+            const phoneNumber = document.getElementById("phoneNumber").value;
+            if (phoneNumber && latitude !== null && longitude !== null) {
+                const message = `Emergency! Contact: ${phoneNumber}. Location: ${latitude}, ${longitude}`;
+                alert(message);
+                
+                fetch('/send-sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: "+919790559885",
+                        message: message
+                    })
+                });
+            } else {
+                alert("Location not available or phone number missing.");
+            }
+        }
+        
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    latitude = position.coords.latitude;
+                    longitude = position.coords.longitude;
+                    alert(`Location access granted. Latitude: ${latitude}, Longitude: ${longitude}`);
+                }, () => alert("Location access denied."));
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        window.onload = getLocation;
+    </script>
+</body>
+</html>
