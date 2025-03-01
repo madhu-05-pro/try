@@ -1,6 +1,7 @@
 [build]
-  command = "pip install -r requirements.txt"
-  publish = "static"
+  command = "pip install -r requirements.txt && gunicorn app:app"
+  publish = ""  # No static files to serve
+
 
 [dev]
   command = "python app.py"
